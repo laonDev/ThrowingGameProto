@@ -11,6 +11,12 @@ package
 		private static var gameTextures:Dictionary = new Dictionary();
 		private static var gameTextureAtlas:TextureAtlas;
 		
+		[Embed(source="../assets/bgLayer1.jpg")]
+		public static const BgLayer1:Class;
+
+		[Embed(source="../assets/welcome_playButton.png")]
+		public static const PlayButton:Class;
+		
 		[Embed(source="../assets/fly_object.png")]
 		public static const AtlasTextureGame:Class;
 		

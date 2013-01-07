@@ -1,7 +1,6 @@
 package object
 {
 	import starling.display.Image;
-	import starling.display.MovieClip;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	
