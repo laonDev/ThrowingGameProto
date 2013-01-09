@@ -1,10 +1,15 @@
 package
 {
+	import com.greensock.TweenLite;
+	
 	import flash.geom.Point;
 	import flash.ui.Keyboard;
 	
+	import events.UIEvent;
+	
 	import object.FlyObject;
 	import object.GameBackGround;
+	import object.UserInterface;
 	
 	import starling.display.Button;
 	import starling.display.Sprite;
@@ -18,9 +23,12 @@ package
 		private const VERTICAL_MEASURE:Number = 2;
 		private const INIT_OBJECT_POSITION:Point = new Point(250, 300);
 		private const WIND_FORCE_TABLE:Array = [10, 15, 20, 25, 30];
+		private const DEGREES:Array = [11.25, 22.5, 45];
+		
 		private var flyObject:FlyObject;
 		private var bg:GameBackGround;
 		private var info:Information;
+		private var ui:UserInterface;
 		
 		private var setting:GameSetting;
 		private var playBtn:Button;
@@ -33,8 +41,11 @@ package
 		private var massive:Number;
 		private var tick:Number = 0;
 		private var windForce:Number = 10;
+		private var moveX:Number;
+		private var moveY:Number;
 		private var prevX:Number;
 		private var prevY:Number;
+		private var degreeChangeCount:int;
 		
 		public function Game()
 		{
@@ -67,39 +78,29 @@ package
 			playBtn.addEventListener(Event.TRIGGERED, onPlayClick);
 			this.addChild(playBtn);
 			
-			
+			ui = new UserInterface();
+			this.addChild(ui);
+			this.addEventListener(UIEvent.BUTTON_CLICK, onUIButtonClick);
 			
 		}
 		
-		private function onPlayClick(e:Event):void
+		private function onUIButtonClick(e:UIEvent):void
 		{
-			// game setting view and play button remove on the screen
-			// and get setting value from GameSetting and set values
-			setting.temporaryDipose();
-			playBtn.visible = false;
-			info.distance = 0;
-			info.speed = 0;
-			info.altitude = 0;
+			trace(e.data.id);
 			
-			vx = vy = 0;
-			tick = 0;
-			
-			initForce = setting.force > 0 ? setting.force : 20;
-			initDegree = setting.degree;
-			gravity = setting.gravity > 0 ? setting.gravity : 9.8;
-			massive = setting.massive > 0 ? setting.massive : 1;
-			
-			trace("force: ", initForce);
-			trace("degree: ", initDegree);
-			trace("gravity: ", gravity);
-			trace("massice: ", massive);
-			flyObject.x = flyObject.width /2;
-			flyObject.y = stage.stageHeight - flyObject.height;
-			flyObject.rotation = deg2rad(initDegree);
-			
-			this.addEventListener(Event.ENTER_FRAME, onGameTick);
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-						
+			switch(e.data.id)
+			{
+				case UserInterface.UP:
+					initDegree -= 11.25
+					TweenLite.to(flyObject, 0.5, {rotation: deg2rad(initDegree)});
+					break;
+				case UserInterface.DOWN:
+					initDegree += 11.25
+					TweenLite.to(flyObject, 0.5, {rotation: deg2rad(initDegree)});
+					break;
+				case UserInterface.BOOST:
+					break;
+			}
 		}
 		
 		private function onKeyDown(e:KeyboardEvent):void
@@ -121,17 +122,59 @@ package
 			trace(initDegree);
 		}
 		
+		private function initialize():void
+		{
+			setting.initialize();
+			bg.isGround = false;
+			playBtn.visible = true;
+			moveX = moveY = 0;
+			degreeChangeCount = 0;
+			
+		}
+		private function onPlayClick(e:Event):void
+		{
+			// game setting view and play button remove on the screen
+			// and get setting value from GameSetting and set values
+			setting.temporaryDipose();
+			playBtn.visible = false;
+			info.distance = 0;
+			info.speed = 0;
+			info.altitude = 0;
+			
+			degreeChangeCount = 0;
+			moveX = moveY = 0;
+			vx = vy = 0;
+			tick = 0;
+			
+			initForce = setting.force > 0 ? setting.force : 20;
+			initDegree = setting.degree;
+			gravity = setting.gravity > 0 ? setting.gravity : 9.8;
+			massive = setting.massive > 0 ? setting.massive : 1;
+			
+			trace("force: ", initForce);
+			trace("degree: ", initDegree);
+			trace("gravity: ", gravity);
+			trace("massice: ", massive);
+			flyObject.x = flyObject.width /2;
+			flyObject.y = stage.stageHeight - flyObject.height;
+			flyObject.rotation = deg2rad(initDegree);
+			
+			this.addEventListener(Event.ENTER_FRAME, onGameTick);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+						
+		}
+		
 		private function onGameTick(e:Event):void
 		{
-			vx = (initForce/massive) * Math.cos(deg2rad(-initDegree)) + tick * windForce * Math.cos(deg2rad(180)) / massive;
-			vy = (initForce/massive) * Math.sin(deg2rad(-initDegree)) - gravity * tick - tick * windForce * Math.sin(deg2rad(180)) / massive;
-			//디바이스 별 치환
-			meterToPixel(vx, vy);
-			vx = vx < 0 ? 0 : vx;
+			vx = (initForce/massive) * Math.cos(deg2rad(-initDegree)) + 0.015 * windForce * Math.cos(deg2rad(180)) / massive;
+			vy = (initForce/massive) * Math.sin(deg2rad(-initDegree)) - gravity * tick - 0.015 * windForce * Math.sin(deg2rad(180)) / massive;
+			
+//			vx = vx < 0 ? 0 : vx;
 			//until flying object get to init position move flying object and then move background
 			//fly object land off 
 			trace("vy: ", vy);
 			trace("vx: ", vx);
+			trace("wf: ", 0.015 * windForce * Math.cos(deg2rad(180)) / massive);
 			
 			
 			if(flyObject.x < INIT_OBJECT_POSITION.x)
@@ -151,7 +194,6 @@ package
 			}
 			else //하강 중
 			{
-				trace(flyObject.y , stage.stageHeight);
 				if(bg.isGround)
 				{
 					vy = flyObject.y < stage.stageHeight - flyObject.height/2 ? vy : 0;
@@ -160,7 +202,7 @@ package
 				else
 					bg.speedY = vy;
 				
-				if(vx <= 0)
+				if(vx <= 0 && flyObject.y > stage.stageHeight - flyObject.height/2)
 				{
 					trace("----------");
 					this.removeEventListener(Event.ENTER_FRAME, onGameTick);
@@ -170,8 +212,11 @@ package
 //				
 			}
 			bg.update();
-			info.distance += vx;
-			info.altitude += vy;;
+			//디바이스 별 치환
+//			meterToPixel(vx, vy);
+			setInfo();
+//			info.distance += vx;
+//			info.altitude += vy;;
 			tick += 0.015;
 			//speed
 //			var dx:Number = flyObject.x - (flyObject.x + vx);
@@ -188,12 +233,15 @@ package
 				flyObject.rotation = deg2rad(initDegree);
 			}
 			
-			
-			
-			
-//			flyObject.rotation = -(Math.atan2(diffY, diffX) * 180 / Math.PI);
-//			trace(flyObject.rotation);
-			
+		}
+		
+		private function setInfo():void
+		{
+			// TODO Auto Generated method stub
+			moveX += vx;
+			moveY += vy;
+			info.distance = moveX / stage.stageWidth * HORIZONTAL_MEASURE;
+			info.altitude = moveY / stage.stageHeight * VERTICAL_MEASURE;
 		}
 		
 		private function meterToPixel($vx:Number, $vy:Number):void
@@ -204,14 +252,7 @@ package
 			trace("after : ", vx, vy);
 		}
 		
-		private function initialize():void
-		{
-			setting.initialize();
-			bg.isGround = false;
-			playBtn.visible = true;
-			
-			
-		}
+		
 		
 	}
 }

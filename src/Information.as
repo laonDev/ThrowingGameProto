@@ -61,39 +61,39 @@ package
 			this.addChild(altitudeText);
 		}
 		
-		public function get speed():int
+		public function get speed():Number
 		{
 			return _speed;
 		}
 
-		public function set speed(value:int):void
+		public function set speed(value:Number):void
 		{
 			_speed = value;
-			speedText.text = _speed.toString();
+			speedText.text = _speed.toFixed(1);
 		}
 
-		public function get distance():int
+		public function get distance():Number
 		{
 			return _distance;
 		}
 
-		public function set distance(value:int):void
+		public function set distance(value:Number):void
 		{
 			_distance = value;
-			distanceText.text = _distance.toString();
+			distanceText.text = _distance.toFixed(2);
 		}
 		
-		public function get altitude():int
+		public function get altitude():Number
 		{
 			return _altitude;
 		}
 		
-		public function set altitude(value:int):void
+		public function set altitude(value:Number):void
 		{
 			_altitude = value;
 			if( _altitude < 0)
 				_altitude = 0;
-			altitudeText.text = _altitude.toString();
+			altitudeText.text = _altitude.toFixed(2);
 		}
 
 	}

@@ -15,10 +15,8 @@ package
 		public function ThrowingGameProto()
 		{
 			super();
-			
 			stats = new Stats();
 			addChild(stats);
-			
 			star = new Starling(Game, stage);
 			star.antiAliasing = 1;
 			star.start();
