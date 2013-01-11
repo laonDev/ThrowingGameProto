@@ -166,15 +166,18 @@ package
 		
 		private function onGameTick(e:Event):void
 		{
-			vx = (initForce/massive) * Math.cos(deg2rad(-initDegree)) + 0.015 * windForce * Math.cos(deg2rad(180)) / massive;
-			vy = (initForce/massive) * Math.sin(deg2rad(-initDegree)) - gravity * tick - 0.015 * windForce * Math.sin(deg2rad(180)) / massive;
+//			vx = (initForce/massive) * Math.cos(deg2rad(-initDegree));
+//			vy = (initForce/massive) * Math.sin(deg2rad(-initDegree)) - gravity * tick;
+			
+			vx = (initForce/massive) * Math.cos(deg2rad(-initDegree)) + 0.0015 * windForce * Math.cos(deg2rad(180)) / massive;
+			vy = (initForce/massive) * Math.sin(deg2rad(-initDegree)) - gravity * tick - 0.0015 * windForce * Math.sin(deg2rad(180)) / massive;
 			
 //			vx = vx < 0 ? 0 : vx;
 			//until flying object get to init position move flying object and then move background
 			//fly object land off 
-			trace("vy: ", vy);
-			trace("vx: ", vx);
-			trace("wf: ", 0.015 * windForce * Math.cos(deg2rad(180)) / massive);
+//			trace("vy: ", vy);
+//			trace("vx: ", vx);
+//			trace("wf: ", 0.015 * windForce * Math.cos(deg2rad(180)) / massive);
 			
 			
 			if(flyObject.x < INIT_OBJECT_POSITION.x)
@@ -228,7 +231,7 @@ package
 			prevY = vy;
 			if(vy < 0)
 			{
-				initDegree += 0.4;
+				initDegree += 0.08;
 				if(initDegree >= 30) initDegree = 30;
 				flyObject.rotation = deg2rad(initDegree);
 			}

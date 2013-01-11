@@ -42,11 +42,13 @@ package object
 		}
 		public function update():void
 		{
-			bgLayer1.x -= _speedX;
+//			bgLayer1.x -= _speedX;
+			bgLayer1.x = _speedX;
 			if(bgLayer1.x > 0) bgLayer1.x = -stage.stageWidth;
 			if(bgLayer1.x < -stage.stageWidth) bgLayer1.x = 0;
-			bgLayer1.y += _speedY;
+//			bgLayer1.y += _speedY;
 			trace(_isGround);
+			bgLayer1.y = _speedY;
 			if(bgLayer1.y <= 0)
 			{
 				bgLayer1.y = 0;

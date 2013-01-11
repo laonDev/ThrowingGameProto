@@ -1,6 +1,7 @@
 package
 {
 	import flash.display.Sprite;
+	import flash.events.Event;
 	
 	import net.hires.debug.Stats;
 	
@@ -17,10 +18,17 @@ package
 			super();
 			stats = new Stats();
 			addChild(stats);
-			star = new Starling(Game, stage);
+			star = new Starling(Main, stage);
 			star.antiAliasing = 1;
 			star.start();
 			
+			stage.stage3Ds[0].addEventListener(Event.CONTEXT3D_CREATE, onContextCreated);
+		}
+		private function onContextCreated(e:Event):void
+		{
+			var debugSprite:Sprite = new Sprite();
+			addChild(debugSprite);
+			(star.stage.getChildAt(0) as Main).setDebugDraw(debugSprite);
 		}
 	}
 }
